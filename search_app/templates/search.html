@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            body {
+                background-color: #e0f7fa;
+                color: #333;
+            }
+            .btn-favorites {
+                margin: 0 5px;
+                background-color: #009688;
+                color: white;
+                border: none;
+            }
+            .btn-favorites:hover {
+                background-color: #00796b;
+                color: white;
+            }
+            .modal-header {
+                background-color: #009688;
+                color: white;
+            }
+            .modal-footer .btn-secondary {
+                background-color: #f1f8e9;
+                border: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container my-5">
+            <h1 class="text-center mb-4">検索アプリ</h1>
+
+            <div class="text-center">
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+                <a href="{% url 'accounts:signup' %}" class="btn btn-primary">新規登録</a>
+                <button class="btn btn-favorites" data-toggle="modal" data-target="#favoritesModal">お気に入りリストを見る</button>
+                <button class="btn btn-favorites" data-toggle="modal" data-target="#historyModal">検索履歴を見る</button>
+                <button class="btn btn-favorites" data-toggle="modal" data-target="#createProductModal">新しい商品を作成</button>
+                <button class="btn btn-favorites" data-toggle="modal" data-target="#productListModal">商品一覧</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="favoritesModal" tabindex="-1" aria-labelledby="favoritesModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="favoritesModalLabel">お気に入りリスト</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="favorites-list" class="list-group"></ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="historyModalLabel">検索履歴</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="history-list" class="list-group"></ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createProductModalLabel">新しい商品を作成</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="create-product-form" onsubmit="return createProduct();">
+                            <div class="form-group">
+                                <label for="product-name">商品名:</label>
+                                <input type="text" id="product-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-price">価格:</label>
+                                <input type="number" id="product-price" min="0" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">商品を作成</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="productListModal" tabindex="-1" aria-labelledby="productListModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="productListModalLabel">商品一覧</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="product-list" class="list-group"></ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script>
+            let favorites = [];
+            let searchHistory = [];
+            let products = [];
+
+            function addToFavorites(productName) {
+                if (!favorites.includes(productName)) {
+                    favorites.push(productName);
+                    updateFavoritesList();
+                } else {
+                    alert("この商品はすでにお気に入りに追加されています。");
+                }
+            }
+
+            function updateFavoritesList() {
+                const favoritesList = document.getElementById("favorites-list");
+                favoritesList.innerHTML = favorites.map(name => `<li class="list-group-item">${name}</li>`).join("");
+            }
+
+            function updateSearchHistory() {
+                const historyList = document.getElementById("history-list");
+                historyList.innerHTML = searchHistory.map(query => `<li class="list-group-item">カテゴリ: ${query.category}, 価格範囲: ${query.minPrice} - ${query.maxPrice}</li>`).join("");
+            }
+
+            function createProduct() {
+                const name = document.getElementById("product-name").value;
+                const price = document.getElementById("product-price").value;
+                products.push({ name, price });
+                alert("商品が作成されました: " + name);
+                updateProductList();
+                return false;
+            }
+
+            function updateProductList() {
+                const productList = document.getElementById("product-list");
+                productList.innerHTML = products.map(p => `<li class="list-group-item">${p.name} - ${p.price}円</li>`).join("");
+            }
+        </script>
+    </body>
+</html>
+
+                    <div id="product-list-container" class="hidden mt-4">
+                        <h2>商品リスト</h2>
+                        <ul class="list-group" id="product-list"></ul>
+                    </div>
+
+                <div class="card p-4 shadow-sm mt-4">
+                    <form id="search-form" method="get" class="mb-4" onsubmit="return handleSearch();">
+                        <div class="form-group">
+                            <label for="category">カテゴリ:</label>
+                            <select name="category" class="form-control">
+                                <option value="">すべて</option>
+                                <option value="書籍">本</option>
+                                <option value="電子機器">電子機器</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="min_price">最低価格:</label>
+                            <input type="number" name="min_price" min="0" class="form-control"> 
+                        </div>
+                        <div class="form-group">
+                            <label for="max_price">最高価格:</label> 
+                            <input type="number" name="max_price" min="0" class="form-control"> 
+                        </div>
+                        <div class="form-group">
+                            <label for="sort">並び替え:</label>
+                            <select name="sort" class="form-control">
+                                <option value="name">名前順</option>
+                                <option value="price_asc">価格が安い順</option>
+                                <option value="price_desc">価格が高い順</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">検索</button> 
+                    </form>
+                </div>
+
+                <div class="mt-4">
+                    <ul class="list-group">
+                    {% for product in page_obj %}
+                        <li class="list-group-item mb-3">
+                            <div class="card shadow-sm">
+                                <div class="card-body text-center">
+                                    <a href="{% url 'search_app:product_detail' product.pk %}" class="btn btn-primary">詳細</a>
+                                    <h2 class="card-title">{{ product.name }}</h2>
+                                    <p class="card-text">{{ product.price }}円</p>
+                                    <button class="btn btn-secondary" onclick="addToFavorites('{{ product.name }}')">お気に入り追加</button>
+                                </div>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center">結果が見つかりませんでした</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a class="btn btn-secondary" href="?page=1">最初</a>  
+                            <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">前へ</a>
+                        {% endif %}
+                        
+                        <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+                        {% if page_obj.has_next %}
+                            <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">次へ</a>
+                            <a class="btn btn-secondary" href="?page={{ page_obj.paginator.num_pages }}">最後</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let products = [];
+        let favorites = [];
+        let searchHistory = [];
+        let validUsername = 'user';
+        let validPassword = 'pass';
+        let registeredUsers = [];
+
+        function addToFavorites(productName) {
+            if (!favorites.includes(productName)) {
+                favorites.push(productName);
+                updateFavoritesList();
+            } else {
+                alert('この商品はすでにお気に入りに追加されています。');
+            }
+        }
+
+        function removeFromFavorites(productName) {
+            favorites = favorites.filter(name => name !== productName);
+            updateFavoritesList();
+        }
+
+        function updateFavoritesList() {
+            const favoritesList = document.getElementById('favorites-list');
+            favoritesList.innerHTML = '';
+
+            favorites.forEach(name => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.textContent = name;
+
+                const removeButton = document.createElement('button');
+                removeButton.className = 'btn btn-danger btn-sm';
+                removeButton.textContent = 'お気に入り解除';
+                removeButton.onclick = () => removeFromFavorites(name);
+
+                li.appendChild(removeButton);
+                favoritesList.appendChild(li);
+            });
+        }
+
+        function updateSearchHistory() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = '';
+
+            searchHistory.forEach(query => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = カテゴリ: ${query.category}, 最低価格: ${query.minPrice}, 最高価格: ${query.maxPrice}, 並び替え: ${query.sort};
+                historyList.appendChild(li);
+            });
+        }
+
+        function updateProductList() {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = '';
+
+            products.forEach(product => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = ${product.name} - ${product.price}円;
+                productList.appendChild(li);
+            });
+        }
+
+        function handleSearch() {
+            const category = document.querySelector('select[name="category"]').value;
+            const minPrice = document.querySelector('input[name="min_price"]').value;
+            const maxPrice = document.querySelector('input[name="max_price"]').value;
+            const sort = document.querySelector('select[name="sort"]').value;
+
+            const searchQuery = { category, minPrice, maxPrice, sort };
+            searchHistory.push(searchQuery);
+            updateSearchHistory();
+
+            return false; 
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === validUsername && password === validPassword) {
+                alert('ログイン成功！');
+                document.getElementById('login-container').classList.add('hidden');
+                resetOtherContainers();
+            } else {
+                alert('ユーザー名またはパスワードが間違っています。');
+            }
+            return false; 
+        }
+
+        function handleRegister() {
+            const newUsername = document.getElementById('new-username').value;
+            const newPassword = document.getElementById('new-password').value;
+
+            if (newUsername && newPassword) {
+                registeredUsers.push({ username: newUsername, password: newPassword });
+                alert('登録が完了しました！');
+                document.getElementById('register-form').reset();
+                toggleRegisterForm();
+            }
+            return false; 
+        }
+
+        function toggleLoginForm() {
+            const loginContainer = document.getElementById('login-container');
+            loginContainer.classList.toggle('hidden');
+            resetOtherContainers('login-container');
+        }
+
+        function toggleRegisterForm() {
+            const registerContainer = document.getElementById('register-container');
+            registerContainer.classList.toggle('hidden');
+            resetOtherContainers('register-container');
+        }
+
+        function toggleLogout() {
+            alert('ログアウトしました。');
+           
+        }
+
+        function toggleFavoritesList() {
+            const favoritesContainer = document.getElementById('favorites-container');
+            favoritesContainer.classList.toggle('hidden');
+            resetOtherContainers('favorites-container');
+        }
+
+        function toggleHistoryList() {
+            const historyContainer = document.getElementById('history-container');
+            historyContainer.classList.toggle('hidden');
+            resetOtherContainers('history-container');
+        }
+
+        function toggleCreateProductForm() {
+            const createProductContainer = document.getElementById('create-product-container');
+            createProductContainer.classList.toggle('hidden');
+            resetOtherContainers('create-product-container');
+        }
+
+        function toggleProductList() {
+            const productListContainer = document.getElementById('product-list-container');
+            productListContainer.classList.toggle('hidden');
+            updateProductList();
+            resetOtherContainers('product-list-container');
+        }
+
+        function resetOtherContainers(exclude = '') {
+            const containers = ['favorites-container', 'history-container', 'create-product-container', 'product-list-container', 'login-container', 'register-container'];
+            containers.forEach(container => {
+                if (container !== exclude) {
+                    document.getElementById(container).classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
