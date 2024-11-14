@@ -5,70 +5,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品詳細</title>
-    <link href="https://cdn.jsdelivr.net/npm /bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            background-color: #e0f7fa; /* 水色背景 */
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #00796b;
+            color: white;
+            border-radius: 10px 10px 0 0;
+            padding: 10px;
+            text-align: center;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .btn-primary, .btn-secondary, .btn-danger {
+            background-color: #009688;
+            border-color: #00796b;
+            color: white;
+        }
+        .btn-primary:hover, .btn-secondary:hover, .btn-danger:hover {
+            background-color: #00796b;
+            border-color: #004d40;
+        }
+        .btn-primary {
+            background-color: #00bfae;
+        }
+        .btn-primary:hover {
+            background-color: #009688;
+        }
+        .btn-danger {
+            background-color: #f44336;
+        }
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        .btn-secondary {
+            background-color: #8e8e8e;
+        }
+        .btn-secondary:hover {
+            background-color: #616161;
+        }
+    </style>
 </head>
 <body>
- <div class="container mt-5">
-   <div class="row justify-content-center">
-   <h1 class="text-center mb-4">{{ product.name }}の詳細</h1>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">{{ product.name }}の詳細</h1>
 
-   <div class="card shadow-sm">
-    <div class="card-body">
-     <h2 class="card-title">{{ product.name }}</h2>
-      <p class="card-text">{{ product.description }}</p>
-      <p class="card-text"><strong>{{ product.price|floatformat:0 }}円</strong></p> 
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h2>{{ product.name }}</h2>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ product.description }}</p>
+                <p class="card-text"><strong>{{ product.price|floatformat:0 }}円</strong></p> 
 
-      <div class="d-flex justify-content-between mt-4">
-        <a href="{% url 'search_app:product_update' product.pk %}" class="btn btn-secondary">編集</a>
-         <form  action="{%  url  'search_app:product_delete'  product.pk  %}"  method="POST"  onsubmit="return confirm('本当に削除しますか？');">
-          {% csrf_token %}
-           <button type="submit" class="btn btn-danger">削除</button>
-         </form>
-        <a href="{% url 'search_app:product_list' %}" class="btn btn-primary">商品一覧に戻る</a>
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'search_app:product_update' product.pk %}" class="btn btn-secondary">編集</a>
+                    <form action="{% url 'search_app:product_delete' product.pk %}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">削除</button>
+                    </form>
+                    <a href="{% url 'search_app:search' %}" class="btn btn-primary">商品一覧に戻る</a>
+                </div>
+            </div>
         </div>
-       </div>
-      </div>
-     </div>
     </div>
-   </div>
-<script src="https://cdn.jsdelivr.net/npm /bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
 
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品詳細</title>
-    <link href="https://cdn.jsdelivr.net/npm /bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
- <div class="container mt-5">
-   <div class="row justify-content-center">
-   <h1 class="text-center mb-4">{{ product.name }}の詳細</h1>
-
-   <div class="card shadow-sm">
-    <div class="card-body">
-     <h2 class="card-title">{{ product.name }}</h2>
-      <p class="card-text">{{ product.description }}</p>
-      <p class="card-text"><strong>{{ product.price|floatformat:0 }}円</strong></p> 
-
-      <div class="d-flex justify-content-between mt-4">
-        <a href="{% url 'search_app:product_update' product.pk %}" class="btn btn-secondary">編集</a>
-         <form  action="{%  url  'search_app:product_delete'  product.pk  %}"  method="POST"  onsubmit="return confirm('本当に削除しますか？');">
-          {% csrf_token %}
-           <button type="submit" class="btn btn-danger">削除</button>
-         </form>
-         <a href="{% url 'search_app:product_list' %}" class="btn btn-primary">商品一覧に戻る</a>
-        </div>
-       </div>
-      </div>
-     </div>
-    </div>
-   </div>
-<script src="https://cdn.jsdelivr.net/npm /bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

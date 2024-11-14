@@ -34,8 +34,20 @@
             <h1 class="text-center mb-4">検索アプリ</h1>
 
             <div class="text-center">
-                <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
-                <a href="{% url 'accounts:signup' %}" class="btn btn-primary">新規登録</a>
+                <div class="text-center" style="margin:10px;">
+                    {% if user.is_authenticated %}
+                        <!-- ログイン状態 -->
+                        <form method="POST" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">ログアウト</button>
+                        </form>
+                    {% else %}
+                        <!-- ログアウト状態 -->
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+                        <a href="{% url 'accounts:signup' %}" class="btn btn-secondary">新規登録</a>
+                    {% endif %}
+                </div>
+                {% if user.is_authenticated %}
                 <button class="btn btn-favorites" data-toggle="modal" data-target="#favoritesModal">お気に入りリストを見る</button>
                 <button class="btn btn-favorites" data-toggle="modal" data-target="#historyModal">検索履歴を見る</button>
                 <button class="btn btn-favorites" data-toggle="modal" data-target="#createProductModal">新しい商品を作成</button>
@@ -62,6 +74,7 @@
             </div>
         </div>
 
+        <!-- 検索履歴 モーダル -->
         <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -128,281 +141,260 @@
                 </div>
             </div>
         </div>
+        <div class="card p-4 shadow-sm mt-4">
+            <form id="search-form" method="get" class="mb-4" onsubmit="return handleSearch();">
+                <div class="form-group">
+                    <label for="category">カテゴリ:</label>
+                    <select name="category" class="form-control">
+                        <option value="">すべて</option>
+                        <option value="書籍">本</option>
+                        <option value="電子機器">電子機器</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="min_price">最低価格:</label>
+                    <input type="number" name="min_price" min="0" class="form-control"> 
+                </div>
+                <div class="form-group">
+                    <label for="max_price">最高価格:</label> 
+                    <input type="number" name="max_price" min="0" class="form-control"> 
+                </div>
+                <div class="form-group">
+                    <label for="sort">並び替え:</label>
+                    <select name="sort" class="form-control">
+                        <option value="name">名前順</option>
+                        <option value="price_asc">価格が安い順</option>
+                        <option value="price_desc">価格が高い順</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">検索</button> 
+            </form>
+        </div>
+
+        <div class="mt-4">
+            <ul class="list-group">
+            {% for product in page_obj %}
+            <li class="list-group-item mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <a href="{% url 'search_app:product_detail' product.pk %}" class="btn btn-primary">詳細</a>
+                        <h2 class="card-title">{{ product.name }}</h2>
+                        <p class="card-text">{{ product.price }}円</p>
+                        
+                        <button class="btn btn-secondary" onclick="addToFavorites('{{ product.name }}')">お気に入り追加</button>
+            
+
+                        <button class="btn btn-danger" onclick="removeFromFavorites('{{ product.name }}')">お気に入り解除</button>
+                    </div>
+                </div>
+            </li>
+            
+            {% empty %}
+                <li class="list-group-item text-center">結果が見つかりませんでした</li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a class="btn btn-secondary" href="?page=1">最初</a>  
+                    <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">前へ</a>
+                {% endif %}
+                
+                <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+                {% if page_obj.has_next %}
+                    <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">次へ</a>
+                    <a class="btn btn-secondary" href="?page={{ page_obj.paginator.num_pages }}">最後</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script>
-            let favorites = [];
-            let searchHistory = [];
-            let products = [];
-
-            function addToFavorites(productName) {
-                if (!favorites.includes(productName)) {
-                    favorites.push(productName);
-                    updateFavoritesList();
-                } else {
-                    alert("この商品はすでにお気に入りに追加されています。");
+                let favorites = [];  
+                let products = [];
+                let searchHistory = [];
+            
+                // お気に入りに商品を追加
+                function addToFavorites(productName) {
+                    if (!favorites.includes(productName)) {
+                        favorites.push(productName);
+                        alert(`${productName} をお気に入りに追加しました`);
+                        updateFavoritesList();
+                    } else {
+                        alert(`${productName} はすでにお気に入りに追加されています`);
+                    }
                 }
-            }
+            
+                // お気に入りから商品を削除
+                function removeFromFavorites(productName) {
+                    favorites = favorites.filter(name => name !== productName);
+                    alert(`${productName} をお気に入りから解除しました`);
+                    updateFavoritesList();
+                }
+            
+                // お気に入りリストを更新
+                function updateFavoritesList() {
+                    const favoritesList = document.getElementById('favorites-list');
+                    favoritesList.innerHTML = '';
+                    favorites.forEach(name => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        li.textContent = name;
+            
+                        const removeButton = document.createElement('button');
+                        removeButton.className = 'btn btn-danger btn-sm';
+                        removeButton.textContent = 'お気に入り解除';
+                        removeButton.onclick = () => removeFromFavorites(name);
+            
+                        li.appendChild(removeButton);
+                        favoritesList.appendChild(li);
+                    });
+                }
+            
+                // 検索履歴を更新
+                function updateSearchHistory() {
+                    const historyList = document.getElementById('history-list');
+                    historyList.innerHTML = '';
+                    searchHistory.forEach(query => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.textContent = `カテゴリ: ${query.category}, 最低価格: ${query.minPrice}, 最高価格: ${query.maxPrice}, 並び替え: ${query.sort}`;
+                        historyList.appendChild(li);
+                    });
+                }
+            
+                // 商品リストを更新
+                function updateProductList() {
+                    const productList = document.getElementById('product-list');
+                    productList.innerHTML = '';
+                    products.forEach(product => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.textContent = `${product.name} - ${product.price}円`;
+                        productList.appendChild(li);
+                    });
+                }
 
-            function updateFavoritesList() {
-                const favoritesList = document.getElementById("favorites-list");
-                favoritesList.innerHTML = favorites.map(name => `<li class="list-group-item">${name}</li>`).join("");
-            }
-
-            function updateSearchHistory() {
-                const historyList = document.getElementById("history-list");
-                historyList.innerHTML = searchHistory.map(query => `<li class="list-group-item">カテゴリ: ${query.category}, 価格範囲: ${query.minPrice} - ${query.maxPrice}</li>`).join("");
-            }
-
-            function createProduct() {
-                const name = document.getElementById("product-name").value;
-                const price = document.getElementById("product-price").value;
-                products.push({ name, price });
-                alert("商品が作成されました: " + name);
-                updateProductList();
-                return false;
-            }
-
-            function updateProductList() {
-                const productList = document.getElementById("product-list");
-                productList.innerHTML = products.map(p => `<li class="list-group-item">${p.name} - ${p.price}円</li>`).join("");
-            }
+                function createProduct() {
+                    const name = document.getElementById('product-name').value;
+                    const price = document.getElementById('product-price').value;
+            
+                    if (name && price) {
+                        const newProduct = { name, price };
+                        products.push(newProduct);
+                        alert('商品が作成されました: ' + name);
+                        document.getElementById('create-product-form').reset();
+                        toggleCreateProductForm();
+                        updateProductList();
+                    }
+                    return false;
+                }
+            
+                // 検索を処理
+                function handleSearch() {
+                    const category = document.querySelector('select[name="category"]').value;
+                    const minPrice = document.querySelector('input[name="min_price"]').value;
+                    const maxPrice = document.querySelector('input[name="max_price"]').value;
+                    const sort = document.querySelector('select[name="sort"]').value;
+            
+                    const searchQuery = { category, minPrice, maxPrice, sort };
+                    searchHistory.push(searchQuery);
+                    updateSearchHistory();
+                    return false;
+                }
+            
+                // ログインを処理
+                function handleLogin() {
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+            
+                    if (username === validUsername && password === validPassword) {
+                        alert('ログイン成功！');
+                        document.getElementById('login-container').classList.add('hidden');
+                        resetOtherContainers();
+                    } else {
+                        alert('ユーザー名またはパスワードが間違っています。');
+                    }
+                    return false;
+                }
+            
+                // 新規登録を処理
+                function handleRegister() {
+                    const newUsername = document.getElementById('new-username').value;
+                    const newPassword = document.getElementById('new-password').value;
+            
+                    if (newUsername && newPassword) {
+                        registeredUsers.push({ username: newUsername, password: newPassword });
+                        alert('登録が完了しました！');
+                        document.getElementById('register-form').reset();
+                        toggleRegisterForm();
+                    }
+                    return false;
+                }
+            
+                // ログインフォームを表示/非表示に切り替え
+                function toggleLoginForm() {
+                    const loginContainer = document.getElementById('login-container');
+                    loginContainer.classList.toggle('hidden');
+                    resetOtherContainers('login-container');
+                }
+            
+                // 新規登録フォームを表示/非表示に切り替え
+                function toggleRegisterForm() {
+                    const registerContainer = document.getElementById('register-container');
+                    registerContainer.classList.toggle('hidden');
+                    resetOtherContainers('register-container');
+                }
+            
+                // ログアウトを処理
+                function toggleLogout() {
+                    alert('ログアウトしました。');
+                }
+            
+                // お気に入りリストを表示/非表示に切り替え
+                function toggleFavoritesList() {
+                    const favoritesContainer = document.getElementById('favorites-container');
+                    favoritesContainer.classList.toggle('hidden');
+                    resetOtherContainers('favorites-container');
+                }
+            
+                // 検索履歴リストを表示/非表示に切り替え
+                function toggleHistoryList() {
+                    const historyContainer = document.getElementById('history-container');
+                    historyContainer.classList.toggle('hidden');
+                    resetOtherContainers('history-container');
+                }
+            
+                // 商品作成フォームを表示/非表示に切り替え
+                function toggleCreateProductForm() {
+                    const createProductContainer = document.getElementById('create-product-container');
+                    createProductContainer.classList.toggle('hidden');
+                    resetOtherContainers('create-product-container');
+                }
+            
+                // 商品リストを表示/非表示に切り替え
+                function toggleProductList() {
+                    const productListContainer = document.getElementById('product-list-container');
+                    productListContainer.classList.toggle('hidden');
+                    updateProductList();
+                    resetOtherContainers('product-list-container');
+                }
+            
+                // 他のコンテナを非表示にする
+                function resetOtherContainers(exclude = '') {
+                    const containers = ['favorites-container', 'history-container', 'create-product-container', 'product-list-container', 'login-container', 'register-container'];
+                    containers.forEach(container => {
+                        if (container !== exclude) {
+                            document.getElementById(container).classList.add('hidden');
+                        }
+                    });
+                }
         </script>
     </body>
 </html>
-
-                    <div id="product-list-container" class="hidden mt-4">
-                        <h2>商品リスト</h2>
-                        <ul class="list-group" id="product-list"></ul>
-                    </div>
-
-                <div class="card p-4 shadow-sm mt-4">
-                    <form id="search-form" method="get" class="mb-4" onsubmit="return handleSearch();">
-                        <div class="form-group">
-                            <label for="category">カテゴリ:</label>
-                            <select name="category" class="form-control">
-                                <option value="">すべて</option>
-                                <option value="書籍">本</option>
-                                <option value="電子機器">電子機器</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="min_price">最低価格:</label>
-                            <input type="number" name="min_price" min="0" class="form-control"> 
-                        </div>
-                        <div class="form-group">
-                            <label for="max_price">最高価格:</label> 
-                            <input type="number" name="max_price" min="0" class="form-control"> 
-                        </div>
-                        <div class="form-group">
-                            <label for="sort">並び替え:</label>
-                            <select name="sort" class="form-control">
-                                <option value="name">名前順</option>
-                                <option value="price_asc">価格が安い順</option>
-                                <option value="price_desc">価格が高い順</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">検索</button> 
-                    </form>
-                </div>
-
-                <div class="mt-4">
-                    <ul class="list-group">
-                    {% for product in page_obj %}
-                        <li class="list-group-item mb-3">
-                            <div class="card shadow-sm">
-                                <div class="card-body text-center">
-                                    <a href="{% url 'search_app:product_detail' product.pk %}" class="btn btn-primary">詳細</a>
-                                    <h2 class="card-title">{{ product.name }}</h2>
-                                    <p class="card-text">{{ product.price }}円</p>
-                                    <button class="btn btn-secondary" onclick="addToFavorites('{{ product.name }}')">お気に入り追加</button>
-                                </div>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item text-center">結果が見つかりませんでした</li>
-                    {% endfor %}
-                    </ul>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="pagination">
-                        {% if page_obj.has_previous %}
-                            <a class="btn btn-secondary" href="?page=1">最初</a>  
-                            <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">前へ</a>
-                        {% endif %}
-                        
-                        <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-
-                        {% if page_obj.has_next %}
-                            <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">次へ</a>
-                            <a class="btn btn-secondary" href="?page={{ page_obj.paginator.num_pages }}">最後</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        let products = [];
-        let favorites = [];
-        let searchHistory = [];
-        let validUsername = 'user';
-        let validPassword = 'pass';
-        let registeredUsers = [];
-
-        function addToFavorites(productName) {
-            if (!favorites.includes(productName)) {
-                favorites.push(productName);
-                updateFavoritesList();
-            } else {
-                alert('この商品はすでにお気に入りに追加されています。');
-            }
-        }
-
-        function removeFromFavorites(productName) {
-            favorites = favorites.filter(name => name !== productName);
-            updateFavoritesList();
-        }
-
-        function updateFavoritesList() {
-            const favoritesList = document.getElementById('favorites-list');
-            favoritesList.innerHTML = '';
-
-            favorites.forEach(name => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                li.textContent = name;
-
-                const removeButton = document.createElement('button');
-                removeButton.className = 'btn btn-danger btn-sm';
-                removeButton.textContent = 'お気に入り解除';
-                removeButton.onclick = () => removeFromFavorites(name);
-
-                li.appendChild(removeButton);
-                favoritesList.appendChild(li);
-            });
-        }
-
-        function updateSearchHistory() {
-            const historyList = document.getElementById('history-list');
-            historyList.innerHTML = '';
-
-            searchHistory.forEach(query => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item';
-                li.textContent = カテゴリ: ${query.category}, 最低価格: ${query.minPrice}, 最高価格: ${query.maxPrice}, 並び替え: ${query.sort};
-                historyList.appendChild(li);
-            });
-        }
-
-        function updateProductList() {
-            const productList = document.getElementById('product-list');
-            productList.innerHTML = '';
-
-            products.forEach(product => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item';
-                li.textContent = ${product.name} - ${product.price}円;
-                productList.appendChild(li);
-            });
-        }
-
-        function handleSearch() {
-            const category = document.querySelector('select[name="category"]').value;
-            const minPrice = document.querySelector('input[name="min_price"]').value;
-            const maxPrice = document.querySelector('input[name="max_price"]').value;
-            const sort = document.querySelector('select[name="sort"]').value;
-
-            const searchQuery = { category, minPrice, maxPrice, sort };
-            searchHistory.push(searchQuery);
-            updateSearchHistory();
-
-            return false; 
-        }
-
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (username === validUsername && password === validPassword) {
-                alert('ログイン成功！');
-                document.getElementById('login-container').classList.add('hidden');
-                resetOtherContainers();
-            } else {
-                alert('ユーザー名またはパスワードが間違っています。');
-            }
-            return false; 
-        }
-
-        function handleRegister() {
-            const newUsername = document.getElementById('new-username').value;
-            const newPassword = document.getElementById('new-password').value;
-
-            if (newUsername && newPassword) {
-                registeredUsers.push({ username: newUsername, password: newPassword });
-                alert('登録が完了しました！');
-                document.getElementById('register-form').reset();
-                toggleRegisterForm();
-            }
-            return false; 
-        }
-
-        function toggleLoginForm() {
-            const loginContainer = document.getElementById('login-container');
-            loginContainer.classList.toggle('hidden');
-            resetOtherContainers('login-container');
-        }
-
-        function toggleRegisterForm() {
-            const registerContainer = document.getElementById('register-container');
-            registerContainer.classList.toggle('hidden');
-            resetOtherContainers('register-container');
-        }
-
-        function toggleLogout() {
-            alert('ログアウトしました。');
-           
-        }
-
-        function toggleFavoritesList() {
-            const favoritesContainer = document.getElementById('favorites-container');
-            favoritesContainer.classList.toggle('hidden');
-            resetOtherContainers('favorites-container');
-        }
-
-        function toggleHistoryList() {
-            const historyContainer = document.getElementById('history-container');
-            historyContainer.classList.toggle('hidden');
-            resetOtherContainers('history-container');
-        }
-
-        function toggleCreateProductForm() {
-            const createProductContainer = document.getElementById('create-product-container');
-            createProductContainer.classList.toggle('hidden');
-            resetOtherContainers('create-product-container');
-        }
-
-        function toggleProductList() {
-            const productListContainer = document.getElementById('product-list-container');
-            productListContainer.classList.toggle('hidden');
-            updateProductList();
-            resetOtherContainers('product-list-container');
-        }
-
-        function resetOtherContainers(exclude = '') {
-            const containers = ['favorites-container', 'history-container', 'create-product-container', 'product-list-container', 'login-container', 'register-container'];
-            containers.forEach(container => {
-                if (container !== exclude) {
-                    document.getElementById(container).classList.add('hidden');
-                }
-            });
-        }
-    </script>
-</body>

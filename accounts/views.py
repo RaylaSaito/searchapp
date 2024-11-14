@@ -21,8 +21,8 @@ class SignupView(CreateView):
 
 class LoginView(BaseLoginView):
     form_class = LoginFrom
+    success_url = reverse_lazy("accounts:index")
     template_name = "accounts/login.html"
 
 class LogoutView(BaseLogoutView):
-    success_url = reverse_lazy("accounts:index")
-
+    next_page = reverse_lazy("search_app:search")
