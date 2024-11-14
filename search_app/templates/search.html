@@ -142,32 +142,43 @@
             </div>
         </div>
         <div class="card p-4 shadow-sm mt-4">
-            <form id="search-form" method="get" class="mb-4" onsubmit="return handleSearch();">
-                <div class="form-group">
-                    <label for="category">カテゴリ:</label>
-                    <select name="category" class="form-control">
-                        <option value="">すべて</option>
-                        <option value="書籍">本</option>
-                        <option value="電子機器">電子機器</option>
-                    </select>
+            <form method="get" class="" style="">
+                <div class="">
+                    <div class="" style="">
+                        {{ form.as_p }}
+                    </div>
+                </div>     
+                <div>
+                    <div>
+                        <label for="category">カテゴリ：</label>
+                        <select class="" name="category" style="">
+                            <option value="" selected>すべて</option>
+                            <option value="書籍">書籍</option>
+                            <option value="電子機器">電子機器</option>
+                        </select>
+                    </div>
+                    <div style="">
+                        <label for="sort">並び替え：</label>
+                        <select class="" name="sort" style="">
+                            <option value="name">名前順</option>
+                            <option value="price_asc">価格が安い順</option>
+                            <option value="price_desc">価格が高い順</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="min_price">最低価格:</label>
-                    <input type="number" name="min_price" min="0" class="form-control"> 
+
+                <div class="" style="">
+                    <div style="">
+                        <label for="min_price">最低価格：</label>
+                        <input class="" style="" type="number" name="min_price" min="0">
+                    </div>
+                    <div style="width:45%;">
+                        <label for="max_price">最高価格：</label>
+                        <input class="" style="" type="number" name="max_price" min="0">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="max_price">最高価格:</label> 
-                    <input type="number" name="max_price" min="0" class="form-control"> 
-                </div>
-                <div class="form-group">
-                    <label for="sort">並び替え:</label>
-                    <select name="sort" class="form-control">
-                        <option value="name">名前順</option>
-                        <option value="price_asc">価格が安い順</option>
-                        <option value="price_desc">価格が高い順</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">検索</button> 
+
+                <button type="submit" class="" style="">検索</button>
             </form>
         </div>
 
