@@ -190,7 +190,7 @@
                     <div class="card-body text-center">
                         <a href="{% url 'search_app:product_detail' product.pk %}" class="btn btn-primary">詳細</a>
                         <h2 class="card-title">{{ product.name }}</h2>
-                        <p class="card-text">{{ product.price }}円</p>
+                        <p class="card-text">{{ product.price|floatformat:0}}円</p>
                         
                         <button class="btn btn-secondary" onclick="addToFavorites('{{ product.name }}')">お気に入り追加</button>
             
