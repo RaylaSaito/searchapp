@@ -4,50 +4,180 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="search_app/static/css/style.css">
         <style>
             body {
-                background-color: #e0f7fa;
+                background-color: #f5f5f5;
+                font-family: 'Arial', sans-serif;
                 color: #333;
+                margin: 0;
+                padding: 0;
             }
-            .btn-favorites {
-                margin: 0 5px;
-                background-color: #009688;
-                color: white;
-                border: none;
+            ul{
+                padding-left:0;
+              }
+              
+            li{
+                list-style:none;
             }
-            .btn-favorites:hover {
+            .container {
+                max-width: 1200px;
+                margin: auto;
+                padding: 20px;
+            }
+        
+            /* グリッドレイアウト設定 */
+            .product-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+        
+            /* 商品カードのデザイン */
+            .card {
+                background-color: #ffffff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+        
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+        
+            .card-body {
+                padding: 15px;
+                text-align: center;
+            }
+        
+            .card-title {
+                font-size: 1.2rem;
+                color: #00796b;
+                margin-bottom: 10px;
+                font-weight: bold;
+            }
+        
+            .card-text {
+                font-size: 1rem;
+                margin-bottom: 15px;
+                color: #555;
+            }
+        
+            .btn {
+                border-radius: 5px;
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        
+            .btn-primary {
                 background-color: #00796b;
                 color: white;
-            }
-            .modal-header {
-                background-color: #009688;
-                color: white;
-            }
-            .modal-footer .btn-secondary {
-                background-color: #f1f8e9;
                 border: none;
             }
-        </style>
+        
+            .btn-primary:hover {
+                background-color: #004d40;
+            }
+        
+            .btn-secondary {
+                background-color: #e0f2f1;
+                color: #00796b;
+                border: none;
+            }
+        
+            .btn-secondary:hover {
+                background-color: #b2dfdb;
+            }
+        
+            .btn-danger {
+                background-color: #e57373;
+                color: white;
+                border: none;
+            }
+        
+            .btn-danger:hover {
+                background-color: #d32f2f;
+            }
+            .card p-4 shadow-sm mt-4{
+                justify-content: center;
+            }
+
+                /* 全体の中央配置 */
+                .form-container {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 70vh; /* 画面全体の高さを確保 */
+                    background-color: #f5f5f5; /* 背景色を設定 */
+                }
+            
+                /* フォーム全体のスタイル */
+                .form-box {
+                    background: #ffffff; /* 背景色を白に設定 */
+                    padding: 20px;
+                    border-radius: 15px;
+                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                    max-width: 1000px; /* 最大幅を設定 */
+                    width: 100%; /* 横幅を親要素に合わせる */
+                }
+            
+                /* 入力フィールドやラベルの間隔を調整 */
+                .form-box .form-group {
+                    margin-bottom: 15px;
+                }
+            
+                .form-box label {
+                    font-weight: bold;
+                    display: block;
+                    margin-bottom: 5px;
+                }
+            
+                .form-box input,
+                .form-box select {
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                }
+            
+                .form-box button {
+                    width: 100%;
+                    padding: 10px;
+                    border: none;
+                    background-color: #00796b;
+                    color: white;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+                }
+            
+                .form-box button:hover {
+                    background-color: #004d40;
+                }
+        </style>         
     </head>
     <body>
         <div class="container my-5">
             <h1 class="text-center mb-4">検索アプリ</h1>
 
-            <div class="text-center">
+            <div class="text-center"> <!--ログイン・ログアウト-->
                 <div class="text-center" style="margin:10px;">
                     {% if user.is_authenticated %}
-                        <!-- ログイン状態 -->
                         <form method="POST" action="{% url 'accounts:logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">ログアウト</button>
                         </form>
                     {% else %}
-                        <!-- ログアウト状態 -->
                         <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
                         <a href="{% url 'accounts:signup' %}" class="btn btn-secondary">新規登録</a>
                     {% endif %}
                 </div>
-                {% if user.is_authenticated %}
+
+                {% if user.is_authenticated %}<!--ログイン中の機能-->
                 <button class="btn btn-favorites" data-toggle="modal" data-target="#favoritesModal">お気に入りリストを見る</button>
                 <button class="btn btn-favorites" data-toggle="modal" data-target="#historyModal">検索履歴を見る</button>
                 <button class="btn btn-favorites" data-toggle="modal" data-target="#createProductModal">新しい商品を作成</button>
@@ -55,6 +185,7 @@
             </div>
         </div>
 
+        <!--お気に入りリストモーダル-->
         <div class="modal fade" id="favoritesModal" tabindex="-1" aria-labelledby="favoritesModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -74,7 +205,7 @@
             </div>
         </div>
 
-        <!-- 検索履歴 モーダル -->
+        <!--検索履歴モーダル-->
         <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -94,6 +225,7 @@
             </div>
         </div>
 
+        <!--商品作成モーダル-->
         <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -123,6 +255,7 @@
             </div>
         </div>
 
+        <!--商品一覧モーダル-->
         <div class="modal fade" id="productListModal" tabindex="-1" aria-labelledby="productListModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -141,87 +274,83 @@
                 </div>
             </div>
         </div>
+
+        <!--検索フォーム-->
         <div class="card p-4 shadow-sm mt-4">
-            <form method="get" class="" style="">
-                <div class="">
-                    <div class="" style="">
-                        {{ form.as_p }}
-                    </div>
-                </div>     
-                <div>
-                    <div>
-                        <label for="category">カテゴリ：</label>
-                        <select class="" name="category" style="">
-                            <option value="" selected>すべて</option>
-                            <option value="書籍">書籍</option>
-                            <option value="電子機器">電子機器</option>
-                        </select>
-                    </div>
-                    <div style="">
-                        <label for="sort">並び替え：</label>
-                        <select class="" name="sort" style="">
-                            <option value="name">名前順</option>
-                            <option value="price_asc">価格が安い順</option>
-                            <option value="price_desc">価格が高い順</option>
-                        </select>
+            <form method="get">
+                <div class="form-container">
+                    <div class="form-box">
+                        <form method="get">
+                            <div class="form-group">
+                                {{ form.as_p }}
+                            </div>
+                            <div class="form-group category">
+                                <label for="category">カテゴリ：</label>
+                                <select name="category">
+                                    <option value="" selected>すべて</option>
+                                    <option value="書籍">書籍</option>
+                                    <option value="電子機器">電子機器</option>
+                                </select>
+                            </div>
+                            <div class="form-group sort">
+                                <label for="sort">並び替え：</label>
+                                <select name="sort">
+                                    <option value="name">名前順</option>
+                                    <option value="price_asc">価格が安い順</option>
+                                    <option value="price_desc">価格が高い順</option>
+                                </select>
+                            </div>
+                            <div class="form-group price">
+                                <label for="min_price">最低価格：</label>
+                                <input type="number" name="min_price" min="0">
+                            </div>
+                            <div class="form-group price">
+                                <label for="max_price">最高価格：</label>
+                                <input type="number" name="max_price" min="0">
+                            </div>
+                            <button type="submit">検索</button>
+                        </form>
                     </div>
                 </div>
-
-                <div class="" style="">
-                    <div style="">
-                        <label for="min_price">最低価格：</label>
-                        <input class="" style="" type="number" name="min_price" min="0">
-                    </div>
-                    <div style="width:45%;">
-                        <label for="max_price">最高価格：</label>
-                        <input class="" style="" type="number" name="max_price" min="0">
-                    </div>
-                </div>
-
-                <button type="submit" class="" style="">検索</button>
             </form>
         </div>
 
+        <!--商品表示-->
         <div class="mt-4">
             <ul class="list-group">
             {% for product in page_obj %}
-            <li class="list-group-item mb-3">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center">
-                        <a href="{% url 'search_app:product_detail' product.pk %}" class="btn btn-primary">詳細</a>
+            <li class="mb-3" style="margin:0 450px; ">
+                <div class="card shadow-sm" style="height:200px;">
+                    <div class="card-body text-center" style="align-content: center;">
                         <h2 class="card-title">{{ product.name }}</h2>
                         <p class="card-text">{{ product.price|floatformat:0}}円</p>
-                        
+                        <a href="{% url 'search_app:product_detail' product.pk %}" class="btn btn-primary">詳細</a>
                         <button class="btn btn-secondary" onclick="addToFavorites('{{ product.name }}')">お気に入り追加</button>
-            
-
                         <button class="btn btn-danger" onclick="removeFromFavorites('{{ product.name }}')">お気に入り解除</button>
                     </div>
                 </div>
             </li>
-            
             {% empty %}
                 <li class="list-group-item text-center">結果が見つかりませんでした</li>
             {% endfor %}
             </ul>
         </div>
 
+        <!--ペジネーション-->
         <div class="d-flex justify-content-between align-items-center mt-4">
             <div class="pagination">
                 {% if page_obj.has_previous %}
                     <a class="btn btn-secondary" href="?page=1">最初</a>  
                     <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">前へ</a>
                 {% endif %}
-                
                 <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-
                 {% if page_obj.has_next %}
                     <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">次へ</a>
                     <a class="btn btn-secondary" href="?page={{ page_obj.paginator.num_pages }}">最後</a>
                 {% endif %}
             </div>
         </div>
-        {% endif %}
+                {% endif %}<!--ログイン中の機能-->
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
@@ -267,17 +396,12 @@
                         favoritesList.appendChild(li);
                     });
                 }
-            
-                // 検索履歴を更新
-                function updateSearchHistory() {
-                    const historyList = document.getElementById('history-list');
-                    historyList.innerHTML = '';
-                    searchHistory.forEach(query => {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item';
-                        li.textContent = `カテゴリ: ${query.category}, 最低価格: ${query.minPrice}, 最高価格: ${query.maxPrice}, 並び替え: ${query.sort}`;
-                        historyList.appendChild(li);
-                    });
+
+                // お気に入りリストを表示/非表示に切り替え
+                function toggleFavoritesList() {
+                    const favoritesContainer = document.getElementById('favorites-container');
+                    favoritesContainer.classList.toggle('hidden');
+                    resetOtherContainers('favorites-container');
                 }
             
                 // 商品リストを更新
@@ -306,8 +430,22 @@
                     }
                     return false;
                 }
+
+                // 商品作成フォームを表示/非表示に切り替え
+                function toggleCreateProductForm() {
+                    const createProductContainer = document.getElementById('create-product-container');
+                    createProductContainer.classList.toggle('hidden');
+                    resetOtherContainers('create-product-container');
+                }
+                            
+                // 商品リストを表示/非表示に切り替え
+                function toggleProductList() {
+                    const productListContainer = document.getElementById('product-list-container');
+                    productListContainer.classList.toggle('hidden');
+                    updateProductList();
+                    resetOtherContainers('product-list-container');
+                }
             
-                // 検索を処理
                 function handleSearch() {
                     const category = document.querySelector('select[name="category"]').value;
                     const minPrice = document.querySelector('input[name="min_price"]').value;
@@ -320,7 +458,6 @@
                     return false;
                 }
             
-                // ログインを処理
                 function handleLogin() {
                     const username = document.getElementById('username').value;
                     const password = document.getElementById('password').value;
@@ -368,33 +505,11 @@
                     alert('ログアウトしました。');
                 }
             
-                // お気に入りリストを表示/非表示に切り替え
-                function toggleFavoritesList() {
-                    const favoritesContainer = document.getElementById('favorites-container');
-                    favoritesContainer.classList.toggle('hidden');
-                    resetOtherContainers('favorites-container');
-                }
-            
                 // 検索履歴リストを表示/非表示に切り替え
                 function toggleHistoryList() {
                     const historyContainer = document.getElementById('history-container');
                     historyContainer.classList.toggle('hidden');
                     resetOtherContainers('history-container');
-                }
-            
-                // 商品作成フォームを表示/非表示に切り替え
-                function toggleCreateProductForm() {
-                    const createProductContainer = document.getElementById('create-product-container');
-                    createProductContainer.classList.toggle('hidden');
-                    resetOtherContainers('create-product-container');
-                }
-            
-                // 商品リストを表示/非表示に切り替え
-                function toggleProductList() {
-                    const productListContainer = document.getElementById('product-list-container');
-                    productListContainer.classList.toggle('hidden');
-                    updateProductList();
-                    resetOtherContainers('product-list-container');
                 }
             
                 // 他のコンテナを非表示にする
