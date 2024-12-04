@@ -122,3 +122,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = "search_app:search"
 LOGOUT_REDIRECT_URL = "accounts:login"
+
+# セッションの設定例
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # セッションをDBに保存
+SESSION_COOKIE_AGE = 3600  # セッションの有効期限（秒）
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # ブラウザを閉じたときにセッションを破棄する

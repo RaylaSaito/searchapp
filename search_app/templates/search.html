@@ -4,7 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="search_app/static/css/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+        
         <style>
             body {
                 background-color: #f5f5f5;
@@ -209,14 +210,19 @@
         <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="historyModalLabel">検索履歴</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <ul id="history-list" class="list-group"></ul>
+                    <div>
+                        <ul>
+                            {% for history in search_history %}
+                                <li>
+                                    キーワード: {{ history.query }},
+                                    カテゴリ: {{ history.category|default:"すべて" }},
+                                    価格帯: {{ history.min_price|default:"指定なし" }} ~ {{ history.max_price|default:"指定なし" }},
+                                    並び替え: {{ history.sort_by }}
+                                </li>
+                            {% empty %}
+                                <li>検索履歴がありません</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
@@ -277,39 +283,38 @@
 
         <!--検索フォーム-->
         <div class="card p-4 shadow-sm mt-4">
-            <form method="get">
+            <form id="search-form">
                 <div class="form-container">
                     <div class="form-box">
-                        <form method="get">
-                            <div class="form-group">
-                                {{ form.as_p }}
-                            </div>
-                            <div class="form-group category">
-                                <label for="category">カテゴリ：</label>
-                                <select name="category">
-                                    <option value="" selected>すべて</option>
-                                    <option value="書籍">書籍</option>
-                                    <option value="電子機器">電子機器</option>
-                                </select>
-                            </div>
-                            <div class="form-group sort">
-                                <label for="sort">並び替え：</label>
-                                <select name="sort">
-                                    <option value="name">名前順</option>
-                                    <option value="price_asc">価格が安い順</option>
-                                    <option value="price_desc">価格が高い順</option>
-                                </select>
-                            </div>
-                            <div class="form-group price">
-                                <label for="min_price">最低価格：</label>
-                                <input type="number" name="min_price" min="0">
-                            </div>
-                            <div class="form-group price">
-                                <label for="max_price">最高価格：</label>
-                                <input type="number" name="max_price" min="0">
-                            </div>
-                            <button type="submit">検索</button>
-                        </form>
+                        <div class="form-group">
+                            <label for="search-keyword">キーワード：</label>
+                            <input type="text" id="search-keyword" class="form-control" name="keyword" placeholder="検索キーワードを入力" required>
+                        </div>
+                        <div class="form-group category">
+                            <label for="category">カテゴリ：</label>
+                            <select id="category" name="category" class="form-control">
+                                <option value="" selected>すべて</option>
+                                <option value="書籍">書籍</option>
+                                <option value="電子機器">電子機器</option>
+                            </select>
+                        </div>
+                        <div class="form-group sort">
+                            <label for="sort">並び替え：</label>
+                            <select id="sort" name="sort" class="form-control">
+                                <option value="name">名前順</option>
+                                <option value="price_asc">価格が安い順</option>
+                                <option value="price_desc">価格が高い順</option>
+                            </select>
+                        </div>
+                        <div class="form-group price">
+                            <label for="min-price">最低価格：</label>
+                            <input type="number" id="min-price" name="min_price" min="0" class="form-control">
+                        </div>
+                        <div class="form-group price">
+                            <label for="max-price">最高価格：</label>
+                            <input type="number" id="max-price" name="max_price" min="0" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-2">検索</button>
                     </div>
                 </div>
             </form>
@@ -335,6 +340,7 @@
             {% endfor %}
             </ul>
         </div>
+        
 
         <!--ペジネーション-->
         <div class="d-flex justify-content-between align-items-center mt-4">
@@ -505,12 +511,74 @@
                     alert('ログアウトしました。');
                 }
             
-                // 検索履歴リストを表示/非表示に切り替え
-                function toggleHistoryList() {
-                    const historyContainer = document.getElementById('history-container');
-                    historyContainer.classList.toggle('hidden');
-                    resetOtherContainers('history-container');
-                }
+                    const SEARCH_HISTORY_KEY = 'searchHistory';
+                
+                    // 検索フォーム送信時の処理
+                    document.getElementById('search-form').addEventListener('submit', function (event) {
+                        event.preventDefault();
+                    
+                        const keyword = document.getElementById('search-keyword').value.trim();
+                        const category = document.getElementById('category').value;
+                        const sort = document.getElementById('sort').value;
+                        const minPrice = document.getElementById('min-price').value;
+                        const maxPrice = document.getElementById('max-price').value;
+                    
+                        if (!keyword) return;
+                    
+                        const searchItem = {
+                            keyword,
+                            category,
+                            sort,
+                            minPrice: minPrice || '指定なし',
+                            maxPrice: maxPrice || '指定なし',
+                        };
+                    
+                        saveSearchHistory(searchItem);
+                    
+                        alert(`検索条件を保存しました: ${keyword}`);
+                        document.getElementById('search-form').reset();
+                    });
+                    
+                
+                    // 検索履歴を保存
+                    function saveSearchHistory(searchItem) {
+                        let history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
+                        history.unshift(searchItem);
+                        history = history.slice(0, 10); // 履歴を10件に制限
+                        localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+                    }
+                
+                    // 検索履歴を表示
+                    function displaySearchHistory() {
+                        const historyList = document.getElementById('history-list');
+                        const history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
+                    
+                        historyList.innerHTML = ''; // リストをクリア
+                    
+                        if (history.length === 0) {
+                            const emptyMessage = document.createElement('li');
+                            emptyMessage.className = 'list-group-item text-center text-muted';
+                            emptyMessage.textContent = '検索履歴がありません';
+                            historyList.appendChild(emptyMessage);
+                        } else {
+                            history.forEach(item => {
+                                const listItem = document.createElement('li');
+                                listItem.className = 'list-group-item';
+                                listItem.innerHTML = `
+                                    <strong>キーワード:</strong> ${item.keyword}<br>
+                                    <strong>カテゴリ:</strong> ${item.category || 'すべて'}<br>
+                                    <strong>並び替え:</strong> ${item.sort}<br>
+                                    <strong>価格帯:</strong> ${item.minPrice} 〜 ${item.maxPrice}
+                                `;
+                                historyList.appendChild(listItem);
+                            });
+                        }
+                    }
+                    
+                    
+                
+                    // モーダルが開くときに履歴を読み込み
+                    document.getElementById('historyModal').addEventListener('show.bs.modal', displaySearchHistory);
             
                 // 他のコンテナを非表示にする
                 function resetOtherContainers(exclude = '') {
@@ -524,3 +592,4 @@
         </script>
     </body>
 </html>
+
