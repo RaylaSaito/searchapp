@@ -561,7 +561,7 @@
                             emptyMessage.textContent = '検索履歴がありません';
                             historyList.appendChild(emptyMessage);
                         } else {
-                            history.forEach(item => {
+                            history.forEach(item = {
                                 const listItem = document.createElement('li');
                                 listItem.className = 'list-group-item';
                                 listItem.innerHTML = `

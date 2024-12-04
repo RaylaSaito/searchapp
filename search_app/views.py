@@ -83,7 +83,6 @@ def search_view(request):
 
     # 現在の検索条件を履歴に追加
     search_history.insert(0, {
-        'query': query,
         'category': category_name,
         'min_price': min_price,
         'max_price': max_price,
