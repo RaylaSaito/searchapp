@@ -1,121 +1,130 @@
-from .forms import SearchForm, ProductForm
-from django.core.paginator import Paginator
+from django.shortcuts import render
+from .models import Product, Category, SearchHistory, Favorite
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Category
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 import logging
 
 logger = logging.getLogger(__name__)
 
-def product_create(request):
+
+@csrf_exempt
+@login_required
+def add_search_history(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('product_list')
-    else:
-        form = ProductForm()
-    return render(request, 'product_form.html', {'form': form})
+        data = json.loads(request.body)
+        query = data.get('query', '').strip()
+        if query:
+            SearchHistory.objects.create(user=request.user, query=query)
+            return JsonResponse({'success': True, 'message': '検索履歴に追加しました。'})
+        return JsonResponse({'success': False, 'message': 'キーワードを入力してください。'})
+    return JsonResponse({'success': False, 'message': '無効なリクエストです。'})
 
-def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    return render(request, 'product_detail.html', {'product': product})
-
-def product_update(request, pk):
-    product = get_object_or_404(Product, pk=pk)
+@login_required
+def toggle_favorite(request, product_id):
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
-        if form.is_valid():
-            form.save()
-            return redirect('product_detail', pk=product.pk)
-    else:
-        form = ProductForm(instance=product)
-    return render(request, 'product_form.html', {'form': form, 'product': product})
+        try:
+            product = get_object_or_404(Product, id=product_id)
+            favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)
+            if not created:
+                favorite.delete()
+                return JsonResponse({'success': True, 'message': f'{product.name} をお気に入りから削除しました。'})
+            return JsonResponse({'success': True, 'message': f'{product.name} をお気に入りに追加しました。'})
+        except Exception as e:
+            logger.error(f"Error in toggle_favorite: {e}")
+            return JsonResponse({'success': False, 'message': 'サーバーエラーが発生しました。'}, status=500)
+    return JsonResponse({'success': False, 'message': '無効なリクエストです。'}, status=400)
 
-def product_delete(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    if request.method == 'POST':
-        product.delete()
-        return redirect('product_list')
-    return render(request, 'product_confirm_delete.html', {'product': product})
+@login_required
+def favorites_list(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+    return render(request, 'search.html', {'favorites': favorites})
 
-def product_list(request):
-    products = Product.objects.all()
-    paginator = Paginator(products, 10)  # ページネーション
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'product_list.html', {'page_obj': page_obj})
+@login_required
+def search_history(request):
+    history = SearchHistory.objects.filter(user=request.user).order_by('-created_at')
+    if not history.exists():
+        return render(request, 'search_history.html', {'history': None, 'message': '検索履歴はありません。'})
+    return render(request, 'search.html', {'history': history})
 
+@login_required
+def favorites_api(request):
+    """
+    ユーザーのお気に入りリストをJSON形式で返すビュー
+    """
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+    favorite_list = [
+        {
+            'id': fav.product.id,
+            'name': fav.product.name,
+            'price': fav.product.price,
+        }
+        for fav in favorites
+    ]
+    return JsonResponse({'favorites': favorite_list}, safe=False)
+
+@login_required
+def favorites_list_api(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+    favorites_data = [
+        {
+            'id': fav.product.id,
+            'name': fav.product.name,
+            'price': fav.product.price,
+        }
+        for fav in favorites
+    ]
+    return JsonResponse({'favorites': favorites_data})
+
+@login_required
 def search_view(request):
-    form = SearchForm(request.GET or None)
+    query = request.GET.get('query', '')
+    category = request.GET.get('category', '')
+    min_price = request.GET.get('min_price', '')
+    max_price = request.GET.get('max_price', '')
+    sort = request.GET.get('sort', 'name')
+
     results = Product.objects.all()
 
-    # フォームが有効な場合の処理
-    if form.is_valid():
-        query = form.cleaned_data.get('query')
-        if query:
-            results = results.filter(name__icontains=query)
+    if query:
+        results = results.filter(Q(name__icontains=query) | Q(description__icontains=query))
 
-    # カテゴリでフィルタリング
-    category_name = request.GET.get('category')
-    if category_name:
-        results = results.filter(category__name=category_name)
+    if category:
+        results = results.filter(category__id=category)
 
-    # 価格フィルタリング
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
     if min_price:
         results = results.filter(price__gte=min_price)
+
     if max_price:
         results = results.filter(price__lte=max_price)
 
-    # ソート
-    sort_by = request.GET.get('sort', 'name')
-    if sort_by == 'price_asc':
+    if sort == 'price_asc':
         results = results.order_by('price')
-    elif sort_by == 'price_desc':
+    elif sort == 'price_desc':
         results = results.order_by('-price')
     else:
         results = results.order_by('name')
-        # 履歴をセッションに保存
-    if 'search_history' not in request.session:
-        request.session['search_history'] = []
-    search_history = request.session['search_history']
 
-    # 現在の検索条件を履歴に追加
-    search_history.insert(0, {
-        'category': category_name,
-        'min_price': min_price,
-        'max_price': max_price,
-        'sort_by': sort_by,
-    })
-    request.session['search_history'] = search_history[:10]  # 履歴は最新10件まで保持
+    # お気に入りリスト
+    favorites = request.user.favorite_entries.all()  # 修正済み
 
-    paginator = Paginator(results, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    # 検索履歴
+    search_history = SearchHistory.objects.filter(user=request.user).order_by('-created_at')
+
+    categories = Category.objects.all()
 
     return render(request, 'search.html', {
-        'form': form,
-        'page_obj': page_obj,
+        'query': query,
+        'category': category,
+        'min_price': min_price,
+        'max_price': max_price,
+        'sort': sort,
         'results': results,
+        'categories': categories,
         'search_history': search_history,
+        'favorites': favorites,  # お気に入りをテンプレートに渡す
     })
-
-def add_to_favorites(request, product_id):
-    if 'favorites' not in request.session:
-        request.session['favorites'] = []
-
-    favorites = request.session['favorites']
-    
-    # ログにセッションの内容を記録
-    logger.debug("お気に入りリスト（保存前）: %s", favorites)
-
-    if product_id not in favorites:
-        favorites.append(product_id)
-        request.session['favorites'] = favorites
-        request.session.modified = True  # セッションの変更を反映
-    
-    logger.debug("お気に入りリスト（保存後）: %s", request.session.get('favorites'))
-
-    return redirect('favorites_page')
 

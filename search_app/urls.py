@@ -1,15 +1,14 @@
 from django.urls import path
-from.import views
+from . import views
 
 app_name = "search_app"
 
-
 urlpatterns = [
     path('', views.search_view, name='search'),
-    path('search/', views.search_view, name='search_view'),
-    path('product/new/', views.product_create, name='product_create'),
-    path('product/<int:pk>/', views.product_detail, name='product_detail'),
-    path('product/<int:pk>/edit/',  views.product_update, name='product_update'),
-    path('product/<int:pk>/delete',  views.product_delete, name='product_delete'),
-    path('product/',views.product_list,name='product_list'),
+    path('add_search_history/', views.add_search_history, name='add_search_history'),
+    path('toggle_favorite/<int:product_id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('favorites_api/', views.favorites_api, name='favorites_api'),  # 追加
+]
+urlpatterns += [
+    path('favorites_list_api/', views.favorites_list_api, name='favorites_list_api'),
 ]

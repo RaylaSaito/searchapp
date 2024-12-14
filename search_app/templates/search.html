@@ -1,194 +1,142 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-        
-        <style>
-            body {
-                background-color: #f5f5f5;
-                font-family: 'Arial', sans-serif;
-                color: #333;
-                margin: 0;
-                padding: 0;
-            }
-            ul{
-                padding-left:0;
-              }
-              
-            li{
-                list-style:none;
-            }
-            .container {
-                max-width: 1200px;
-                margin: auto;
-                padding: 20px;
-            }
-        
-            /* グリッドレイアウト設定 */
-            .product-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
-            }
-        
-            /* 商品カードのデザイン */
-            .card {
-                background-color: #ffffff;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-        
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            }
-        
-            .card-body {
-                padding: 15px;
-                text-align: center;
-            }
-        
-            .card-title {
-                font-size: 1.2rem;
-                color: #00796b;
-                margin-bottom: 10px;
-                font-weight: bold;
-            }
-        
-            .card-text {
-                font-size: 1rem;
-                margin-bottom: 15px;
-                color: #555;
-            }
-        
-            .btn {
-                border-radius: 5px;
-                padding: 10px 15px;
-                font-size: 0.9rem;
-            }
-        
-            .btn-primary {
-                background-color: #00796b;
-                color: white;
-                border: none;
-            }
-        
-            .btn-primary:hover {
-                background-color: #004d40;
-            }
-        
-            .btn-secondary {
-                background-color: #e0f2f1;
-                color: #00796b;
-                border: none;
-            }
-        
-            .btn-secondary:hover {
-                background-color: #b2dfdb;
-            }
-        
-            .btn-danger {
-                background-color: #e57373;
-                color: white;
-                border: none;
-            }
-        
-            .btn-danger:hover {
-                background-color: #d32f2f;
-            }
-            .card p-4 shadow-sm mt-4{
-                justify-content: center;
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <title>検索アプリ</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        .card-body {
+            padding: 15px;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #00796b;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #004d40;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">検索アプリ</h1>
 
-                /* 全体の中央配置 */
-                .form-container {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 70vh; /* 画面全体の高さを確保 */
-                    background-color: #f5f5f5; /* 背景色を設定 */
-                }
-            
-                /* フォーム全体のスタイル */
-                .form-box {
-                    background: #ffffff; /* 背景色を白に設定 */
-                    padding: 20px;
-                    border-radius: 15px;
-                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-                    max-width: 1000px; /* 最大幅を設定 */
-                    width: 100%; /* 横幅を親要素に合わせる */
-                }
-            
-                /* 入力フィールドやラベルの間隔を調整 */
-                .form-box .form-group {
-                    margin-bottom: 15px;
-                }
-            
-                .form-box label {
-                    font-weight: bold;
-                    display: block;
-                    margin-bottom: 5px;
-                }
-            
-                .form-box input,
-                .form-box select {
-                    width: 100%;
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                }
-            
-                .form-box button {
-                    width: 100%;
-                    padding: 10px;
-                    border: none;
-                    background-color: #00796b;
-                    color: white;
-                    border-radius: 5px;
-                    font-size: 16px;
-                    cursor: pointer;
-                    transition: background-color 0.3s ease;
-                }
-            
-                .form-box button:hover {
-                    background-color: #004d40;
-                }
-        </style>         
-    </head>
-    <body>
-        <div class="container my-5">
-            <h1 class="text-center mb-4">検索アプリ</h1>
+        <div class="text-center"> <!--ログイン・ログアウト-->
+            <div class="text-center" style="margin:10px;">
+                {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">ログアウト</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+                    <a href="{% url 'accounts:signup' %}" class="btn btn-secondary">新規登録</a>
+                {% endif %}
+            </div>
 
-            <div class="text-center"> <!--ログイン・ログアウト-->
-                <div class="text-center" style="margin:10px;">
-                    {% if user.is_authenticated %}
-                        <form method="POST" action="{% url 'accounts:logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">ログアウト</button>
-                        </form>
-                    {% else %}
-                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
-                        <a href="{% url 'accounts:signup' %}" class="btn btn-secondary">新規登録</a>
-                    {% endif %}
+            {% if user.is_authenticated %}<!--ログイン中の機能-->
+            <button class="btn btn-favorites" data-toggle="modal" data-target="#favoritesModal">お気に入りリストを見る</button>
+            <button class="btn btn-favorites" data-toggle="modal" data-target="#historyModal">検索履歴を見る</button>
+            <button class="btn btn-favorites" data-toggle="modal" data-target="#createProductModal">新しい商品を作成</button>
+            <button class="btn btn-favorites" data-toggle="modal" data-target="#productListModal">商品一覧</button>
+            {% endif %}
+        </div>
+    </div>
+    <div class="container my-5">
+        <h1 class="text-center mb-4"></h1>
+        
+        <!-- 検索フォーム -->
+        <div class="card p-4 shadow-sm mt-4">
+            <form method="GET" action="" onsubmit="addSearchHistory(document.querySelector('[name=query]').value);">
+
+                <div class="form-group">
+                    <input type="text" name="query" placeholder="キーワードを入力" class="form-control" value="{{ query }}">
                 </div>
+                <div class="form-group">
+                    <label for="category">カテゴリ：</label>
+                    <select name="category" class="form-control">
+                        <option value="">すべて</option>
+                        {% for category in categories %}
+                        <option value="{{ cat.id }}" {% if category == cat.id %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                        
+                        
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="min_price">最低価格：</label>
+                    <input type="number" name="min_price" class="form-control" value="{{ min_price }}">
+                </div>
+                <div class="form-group">
+                    <label for="max_price">最高価格：</label>
+                    <input type="number" name="max_price" class="form-control" value="{{ max_price }}">
+                </div>
+                <div class="form-group">
+                    <label for="sort">並び替え：</label>
+                    <select name="sort" class="form-control">
+                        <option value="name" {% if sort == "name" %}selected{% endif %}>名前順</option>
+                        <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>価格が安い順</option>
+                        <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>価格が高い順</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">検索</button>
+            </form>
+        </div>
+        
 
-                {% if user.is_authenticated %}<!--ログイン中の機能-->
-                <button class="btn btn-favorites" data-toggle="modal" data-target="#favoritesModal">お気に入りリストを見る</button>
-                <button class="btn btn-favorites" data-toggle="modal" data-target="#historyModal">検索履歴を見る</button>
-                <button class="btn btn-favorites" data-toggle="modal" data-target="#createProductModal">新しい商品を作成</button>
-                <button class="btn btn-favorites" data-toggle="modal" data-target="#productListModal">商品一覧</button>
+        <!-- 検索結果表示 -->
+        <div class="mt-4">
+            <h2>検索結果</h2>
+            <div class="product-grid">
+                {% for product in results %}
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">{{ product.name }}</h3>
+                        <p class="card-text">{{ product.price }}円</p>
+                        <p class="card-text">カテゴリ: {{ product.category.name }}</p>
+                        <button class="btn btn-secondary"
+                                onclick="toggleFavorite({{ product.id }})">
+                            お気に入り追加/解除
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">該当する結果がありません。</p>
+                {% endfor %}
             </div>
         </div>
-
-        <!--お気に入りリストモーダル-->
-        <div class="modal fade" id="favoritesModal" tabindex="-1" aria-labelledby="favoritesModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+        <!-- お気に入りリストモーダル -->
+        <div class="modal fade" id="favoritesModal" tabindex="-1" role="dialog" aria-labelledby="favoritesModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="favoritesModalLabel">お気に入りリスト</h5>
@@ -197,30 +145,18 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <ul id="favorites-list" class="list-group"></ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--検索履歴モーダル-->
-        <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div>
-                        <ul>
-                            {% for history in search_history %}
-                                <li>
-                                    キーワード: {{ history.query }},
-                                    カテゴリ: {{ history.category|default:"すべて" }},
-                                    価格帯: {{ history.min_price|default:"指定なし" }} ~ {{ history.max_price|default:"指定なし" }},
-                                    並び替え: {{ history.sort_by }}
+                        <ul id="favoritesList" class="list-group">
+                            {% for favorite in favorites %}
+                                <li class="list-group-item">
+                                    <strong>商品名:</strong> {{ favorite.product.name }}<br>
+                                    <strong>価格:</strong> {{ favorite.product.price }}円
+                                    <form action="{% url 'search_app:toggle_favorite' favorite.product.id %}" method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">削除</button>
+                                    </form>
                                 </li>
                             {% empty %}
-                                <li>検索履歴がありません</li>
+                                <li class="list-group-item text-muted">お気に入りがありません。</li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -230,366 +166,235 @@
                 </div>
             </div>
         </div>
-
-        <!--商品作成モーダル-->
-        <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+        <!-- 検索履歴モーダル -->
+        <div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="historyModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createProductModalLabel">新しい商品を作成</h5>
+                        <h5 class="modal-title" id="historyModalLabel">検索履歴</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="create-product-form" onsubmit="return createProduct();">
-                            <div class="form-group">
-                                <label for="product-name">商品名:</label>
-                                <input type="text" id="product-name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="product-price">価格:</label>
-                                <input type="number" id="product-price" min="0" class="form-control" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">商品を作成</button>
-                        </form>
+                        <ul class="list-group">
+                            {% for history in search_history %}
+                                <li class="list-group-item">
+                                    <strong>検索キーワード:</strong> {{ history.query }}<br>
+                                    <strong>検索日時:</strong> {{ history.created_at|date:"Y-m-d H:i" }}
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item text-muted">検索履歴がありません。</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!--商品一覧モーダル-->
-        <div class="modal fade" id="productListModal" tabindex="-1" aria-labelledby="productListModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="productListModalLabel">商品一覧</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <ul id="product-list" class="list-group"></ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--検索フォーム-->
-        <div class="card p-4 shadow-sm mt-4">
-            <form id="search-form">
-                <div class="form-container">
-                    <div class="form-box">
-                        <div class="form-group">
-                            <label for="search-keyword">キーワード：</label>
-                            <input type="text" id="search-keyword" class="form-control" name="keyword" placeholder="検索キーワードを入力" required>
-                        </div>
-                        <div class="form-group category">
-                            <label for="category">カテゴリ：</label>
-                            <select id="category" name="category" class="form-control">
-                                <option value="" selected>すべて</option>
-                                <option value="書籍">書籍</option>
-                                <option value="電子機器">電子機器</option>
-                            </select>
-                        </div>
-                        <div class="form-group sort">
-                            <label for="sort">並び替え：</label>
-                            <select id="sort" name="sort" class="form-control">
-                                <option value="name">名前順</option>
-                                <option value="price_asc">価格が安い順</option>
-                                <option value="price_desc">価格が高い順</option>
-                            </select>
-                        </div>
-                        <div class="form-group price">
-                            <label for="min-price">最低価格：</label>
-                            <input type="number" id="min-price" name="min_price" min="0" class="form-control">
-                        </div>
-                        <div class="form-group price">
-                            <label for="max-price">最高価格：</label>
-                            <input type="number" id="max-price" name="max_price" min="0" class="form-control">
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-2">検索</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!--商品表示-->
-        <div class="mt-4">
-            <ul class="list-group">
-            {% for product in page_obj %}
-            <li class="mb-3" style="margin:0 450px; ">
-                <div class="card shadow-sm" style="height:200px;">
-                    <div class="card-body text-center" style="align-content: center;">
-                        <h2 class="card-title">{{ product.name }}</h2>
-                        <p class="card-text">{{ product.price|floatformat:0}}円</p>
-                        <a href="{% url 'search_app:product_detail' product.pk %}" class="btn btn-primary">詳細</a>
-                        <button class="btn btn-secondary" onclick="addToFavorites('{{ product.name }}')">お気に入り追加</button>
-                        <button class="btn btn-danger" onclick="removeFromFavorites('{{ product.name }}')">お気に入り解除</button>
-                    </div>
-                </div>
-            </li>
-            {% empty %}
-                <li class="list-group-item text-center">結果が見つかりませんでした</li>
-            {% endfor %}
-            </ul>
         </div>
         
-
-        <!--ペジネーション-->
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            <div class="pagination">
-                {% if page_obj.has_previous %}
-                    <a class="btn btn-secondary" href="?page=1">最初</a>  
-                    <a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">前へ</a>
-                {% endif %}
-                <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-                {% if page_obj.has_next %}
-                    <a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">次へ</a>
-                    <a class="btn btn-secondary" href="?page={{ page_obj.paginator.num_pages }}">最後</a>
-                {% endif %}
+            </div>
+            <!-- モーダル -->
+        <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="notificationModalLabel">通知</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="notificationMessage">
+                        <!-- メッセージがここに表示されます -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                    </div>
+                </div>
             </div>
         </div>
-                {% endif %}<!--ログイン中の機能-->
 
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script>
-                let favorites = [];  
-                let products = [];
-                let searchHistory = [];
-            
-                // お気に入りに商品を追加
-                function addToFavorites(productName) {
-                    if (!favorites.includes(productName)) {
-                        favorites.push(productName);
-                        alert(`${productName} をお気に入りに追加しました`);
-                        updateFavoritesList();
+    <script>
+        function addSearchHistory(query) {
+            fetch("{% url 'search_app:add_search_history' %}", { // URLの修正
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showModal(data.message);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function toggleFavorite(productId) {
+            const url = `/search_app/toggle_favorite/${productId}/`;
+        
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message); // ユーザーに通知
+                updateFavoriteButton(productId, data.success); // ボタンの見た目を更新
+                updateFavorites(); // お気に入りリストをリアルタイム更新
+            })
+            .catch(error => console.error('Error:', error));
+        }                     
+        
+        function updateFavorites() {
+            fetch("{% url 'search_app:favorites_list_api' %}") // APIエンドポイント
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const favoritesList = document.getElementById('favoritesList'); // モーダル内のリスト要素
+                    favoritesList.innerHTML = ''; // リストをリセット
+        
+                    if (data.favorites && data.favorites.length > 0) {
+                        data.favorites.forEach(fav => {
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('list-group-item');
+                            listItem.innerHTML = `
+                                <strong>商品名:</strong> ${fav.name}<br>
+                                <strong>価格:</strong> ${fav.price}円
+                                <button class="btn btn-danger btn-sm" onclick="toggleFavorite(${fav.id})">削除</button>
+                            `;
+                            favoritesList.appendChild(listItem);
+                        });
                     } else {
-                        alert(`${productName} はすでにお気に入りに追加されています`);
+                        favoritesList.innerHTML = '<li class="list-group-item text-muted">お気に入りがありません。</li>';
                     }
-                }
-            
-                // お気に入りから商品を削除
-                function removeFromFavorites(productName) {
-                    favorites = favorites.filter(name => name !== productName);
-                    alert(`${productName} をお気に入りから解除しました`);
-                    updateFavoritesList();
-                }
-            
-                // お気に入りリストを更新
-                function updateFavoritesList() {
-                    const favoritesList = document.getElementById('favorites-list');
-                    favoritesList.innerHTML = '';
-                    favorites.forEach(name => {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                        li.textContent = name;
-            
-                        const removeButton = document.createElement('button');
-                        removeButton.className = 'btn btn-danger btn-sm';
-                        removeButton.textContent = 'お気に入り解除';
-                        removeButton.onclick = () => removeFromFavorites(name);
-            
-                        li.appendChild(removeButton);
-                        favoritesList.appendChild(li);
-                    });
-                }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        function showModal(message) {
+            const modalMessage = document.getElementById('notificationMessage');
+            modalMessage.textContent = message;
+            $('#notificationModal').modal('show');
+        }
+        
 
-                // お気に入りリストを表示/非表示に切り替え
-                function toggleFavoritesList() {
-                    const favoritesContainer = document.getElementById('favorites-container');
-                    favoritesContainer.classList.toggle('hidden');
-                    resetOtherContainers('favorites-container');
+        function toggleFavorite(productId) {
+            const url = `/search_app/toggle_favorite/${productId}/`;
+        
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            
-                // 商品リストを更新
-                function updateProductList() {
-                    const productList = document.getElementById('product-list');
-                    productList.innerHTML = '';
-                    products.forEach(product => {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item';
-                        li.textContent = `${product.name} - ${product.price}円`;
-                        productList.appendChild(li);
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message); // ユーザーに通知
+                updateFavoriteButton(productId, data.success); // ボタンの見た目を更新
+                loadFavorites(); // お気に入りリストを更新
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function loadFavorites() {
+            fetch("{% url 'search_app:favorites_api' %}", {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const favoritesList = document.getElementById('favoritesList');
+                favoritesList.innerHTML = ''; // リストをリセット
+        
+                if (data.favorites && data.favorites.length > 0) {
+                    data.favorites.forEach(fav => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item');
+                        listItem.innerHTML = `
+                            <strong>商品名:</strong> ${fav.name}<br>
+                            <strong>価格:</strong> ${fav.price}円
+                            <button class="btn btn-danger btn-sm" onclick="removeFavorite(${fav.id})">削除</button>
+                        `;
+                        favoritesList.appendChild(listItem);
                     });
+                } else {
+                    favoritesList.innerHTML = '<li class="list-group-item text-muted">お気に入りがありません。</li>';
                 }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function removeFavorite(productId) {
+            const url = `{% url 'search_app:toggle_favorite' 0 %}`.replace('0', productId);
+        
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadFavorites(); // お気に入りを再ロード
+            })
+            .catch(error => console.error('Error:', error));
+        }
 
-                function createProduct() {
-                    const name = document.getElementById('product-name').value;
-                    const price = document.getElementById('product-price').value;
-            
-                    if (name && price) {
-                        const newProduct = { name, price };
-                        products.push(newProduct);
-                        alert('商品が作成されました: ' + name);
-                        document.getElementById('create-product-form').reset();
-                        toggleCreateProductForm();
-                        updateProductList();
-                    }
-                    return false;
+        function updateFavoriteButton(productId, isAdded) {
+            const button = document.querySelector(`button[data-product-id="${productId}"]`);
+            if (button) {
+                if (isAdded) {
+                    button.classList.remove('btn-secondary');
+                    button.classList.add('btn-success');
+                    button.textContent = 'お気に入り解除';
+                } else {
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-secondary');
+                    button.textContent = 'お気に入り追加';
                 }
+            }
+        }
+               
+        
+    </script>
 
-                // 商品作成フォームを表示/非表示に切り替え
-                function toggleCreateProductForm() {
-                    const createProductContainer = document.getElementById('create-product-container');
-                    createProductContainer.classList.toggle('hidden');
-                    resetOtherContainers('create-product-container');
-                }
-                            
-                // 商品リストを表示/非表示に切り替え
-                function toggleProductList() {
-                    const productListContainer = document.getElementById('product-list-container');
-                    productListContainer.classList.toggle('hidden');
-                    updateProductList();
-                    resetOtherContainers('product-list-container');
-                }
-            
-                function handleSearch() {
-                    const category = document.querySelector('select[name="category"]').value;
-                    const minPrice = document.querySelector('input[name="min_price"]').value;
-                    const maxPrice = document.querySelector('input[name="max_price"]').value;
-                    const sort = document.querySelector('select[name="sort"]').value;
-            
-                    const searchQuery = { category, minPrice, maxPrice, sort };
-                    searchHistory.push(searchQuery);
-                    updateSearchHistory();
-                    return false;
-                }
-            
-                function handleLogin() {
-                    const username = document.getElementById('username').value;
-                    const password = document.getElementById('password').value;
-            
-                    if (username === validUsername && password === validPassword) {
-                        alert('ログイン成功！');
-                        document.getElementById('login-container').classList.add('hidden');
-                        resetOtherContainers();
-                    } else {
-                        alert('ユーザー名またはパスワードが間違っています。');
-                    }
-                    return false;
-                }
-            
-                // 新規登録を処理
-                function handleRegister() {
-                    const newUsername = document.getElementById('new-username').value;
-                    const newPassword = document.getElementById('new-password').value;
-            
-                    if (newUsername && newPassword) {
-                        registeredUsers.push({ username: newUsername, password: newPassword });
-                        alert('登録が完了しました！');
-                        document.getElementById('register-form').reset();
-                        toggleRegisterForm();
-                    }
-                    return false;
-                }
-            
-                // ログインフォームを表示/非表示に切り替え
-                function toggleLoginForm() {
-                    const loginContainer = document.getElementById('login-container');
-                    loginContainer.classList.toggle('hidden');
-                    resetOtherContainers('login-container');
-                }
-            
-                // 新規登録フォームを表示/非表示に切り替え
-                function toggleRegisterForm() {
-                    const registerContainer = document.getElementById('register-container');
-                    registerContainer.classList.toggle('hidden');
-                    resetOtherContainers('register-container');
-                }
-            
-                // ログアウトを処理
-                function toggleLogout() {
-                    alert('ログアウトしました。');
-                }
-            
-                    const SEARCH_HISTORY_KEY = 'searchHistory';
-                
-                    // 検索フォーム送信時の処理
-                    document.getElementById('search-form').addEventListener('submit', function (event) {
-                        event.preventDefault();
-                    
-                        const keyword = document.getElementById('search-keyword').value.trim();
-                        const category = document.getElementById('category').value;
-                        const sort = document.getElementById('sort').value;
-                        const minPrice = document.getElementById('min-price').value;
-                        const maxPrice = document.getElementById('max-price').value;
-                    
-                        if (!keyword) return;
-                    
-                        const searchItem = {
-                            keyword,
-                            category,
-                            sort,
-                            minPrice: minPrice || '指定なし',
-                            maxPrice: maxPrice || '指定なし',
-                        };
-                    
-                        saveSearchHistory(searchItem);
-                    
-                        alert(`検索条件を保存しました: ${keyword}`);
-                        document.getElementById('search-form').reset();
-                    });
-                    
-                
-                    // 検索履歴を保存
-                    function saveSearchHistory(searchItem) {
-                        let history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
-                        history.unshift(searchItem);
-                        history = history.slice(0, 10); // 履歴を10件に制限
-                        localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
-                    }
-                
-                    // 検索履歴を表示
-                    function displaySearchHistory() {
-                        const historyList = document.getElementById('history-list');
-                        const history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
-                    
-                        historyList.innerHTML = ''; // リストをクリア
-                    
-                        if (history.length === 0) {
-                            const emptyMessage = document.createElement('li');
-                            emptyMessage.className = 'list-group-item text-center text-muted';
-                            emptyMessage.textContent = '検索履歴がありません';
-                            historyList.appendChild(emptyMessage);
-                        } else {
-                            history.forEach(item = {
-                                const listItem = document.createElement('li');
-                                listItem.className = 'list-group-item';
-                                listItem.innerHTML = `
-                                    <strong>キーワード:</strong> ${item.keyword}<br>
-                                    <strong>カテゴリ:</strong> ${item.category || 'すべて'}<br>
-                                    <strong>並び替え:</strong> ${item.sort}<br>
-                                    <strong>価格帯:</strong> ${item.minPrice} 〜 ${item.maxPrice}
-                                `;
-                                historyList.appendChild(listItem);
-                            });
-                        }
-                    }
-                    
-                    
-                
-                    // モーダルが開くときに履歴を読み込み
-                    document.getElementById('historyModal').addEventListener('show.bs.modal', displaySearchHistory);
-            
-                // 他のコンテナを非表示にする
-                function resetOtherContainers(exclude = '') {
-                    const containers = ['favorites-container', 'history-container', 'create-product-container', 'product-list-container', 'login-container', 'register-container'];
-                    containers.forEach(container => {
-                        if (container !== exclude) {
-                            document.getElementById(container).classList.add('hidden');
-                        }
-                    });
-                }
-        </script>
-    </body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
-
